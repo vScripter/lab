@@ -45,6 +45,7 @@ resource "aws_main_route_table_association" "main-route-table" {
 resource "aws_subnet" "10-10-1-0_24" {
   vpc_id     = "${aws_vpc.cloud-lab.id}"
   cidr_block = "10.10.1.0/24"
+  map_public_ip_on_launch = true
 
   tags {
     Name = "10.10.1.0/24"
