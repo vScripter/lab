@@ -22,3 +22,8 @@ variable "aws_key_pair" {
     default = "kevin-general"
 }
 
+variable "instance_count" {
+    description = "number of instances to deploy"
+    default = 1
+}
+

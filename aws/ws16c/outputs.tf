@@ -1,5 +1,18 @@
 # Need to figure out how to better parameterize spinning up multiple servers
 
+output "instance_name" {
+    value = ["${module.ws16c-01.instance_name}"]
+}
+
+output "public_ip" {
+    value = ["${module.ws16c-01.public_ip}"]
+}
+
+output "public_dns" {
+    value = ["${module.ws16c-01.public_dns}"]
+}
+
+/*
 # ws16c-01
 output "01_instance_name" {
     value = ["${module.ws16c-01.instance_name}"]
@@ -25,3 +38,5 @@ output "02_public_ip" {
 output "02_public_dns" {
     value = ["${module.ws16c-02.public_dns}"]
 }
+
+*/

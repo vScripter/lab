@@ -7,5 +7,5 @@ output "public_dns" {
 }
 
 output "instance_name" {
-    value = ["${aws_instance.ws16_core.*.tags.name}"]
+    value = ["${aws_instance.ws16_core.*.tags.Name}"]
 }

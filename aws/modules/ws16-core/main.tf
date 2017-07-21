@@ -55,16 +55,17 @@ data "template_file" "user_data" {
 }
 
 resource "aws_instance" "ws16_core" {
-    ami                    = "${data.aws_ami.ws16_core.id}"
-    instance_type          = "${var.instance_type}"
-    key_name               = "${var.aws_key_pair}"
-    subnet_id              = "${data.terraform_remote_state.vpc.subnet_id}"
-    vpc_security_group_ids = ["${data.terraform_remote_state.vpc.instance_sg}"]
-    user_data              = "${data.template_file.user_data.rendered}"
+  count                  = "${var.instance_count}"
+  ami                    = "${data.aws_ami.ws16_core.id}"
+  instance_type          = "${var.instance_type}"
+  key_name               = "${var.aws_key_pair}"
+  subnet_id              = "${data.terraform_remote_state.vpc.subnet_id}"
+  vpc_security_group_ids = ["${data.terraform_remote_state.vpc.instance_sg}"]
+  user_data              = "${data.template_file.user_data.rendered}"
 
-    tags {
-        Name = "${var.instance_name}"
-    }
+  tags {
+    Name = "${var.instance_name}-${count.index}"
+  }
 }
 
 /*resource "aws_network_interface" "int0" {
