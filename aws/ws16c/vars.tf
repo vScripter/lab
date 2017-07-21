@@ -4,5 +4,5 @@ variable "admin_password" {
 
 variable "instance_count" {
     description = "number of instances to deploy"
-    default = 3
+    default = 2
 }

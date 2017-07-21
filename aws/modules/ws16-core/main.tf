@@ -45,6 +45,7 @@ data "aws_ami" "ws16_core" {
   }
 }
 
+/*
 data "template_file" "user_data" {
   template = "${file("${path.module}/user-data.txt")}"
 
@@ -53,6 +54,7 @@ data "template_file" "user_data" {
     hostname       = "${var.instance_name}"
   }
 }
+*/
 
 resource "aws_instance" "ws16_core" {
   count                  = "${var.instance_count}"
@@ -61,7 +63,18 @@ resource "aws_instance" "ws16_core" {
   key_name               = "${var.aws_key_pair}"
   subnet_id              = "${data.terraform_remote_state.vpc.subnet_id}"
   vpc_security_group_ids = ["${data.terraform_remote_state.vpc.instance_sg}"]
-  user_data              = "${data.template_file.user_data.rendered}"
+  #user_data              = "${data.template_file.user_data.rendered}"
+  user_data              = <<EOF
+<script>
+  winrm quickconfig -q & winrm set winrm/config/winrs @{MaxMemoryPerShellMB="300"} & winrm set winrm/config @{MaxTimeoutms="1800000"} & winrm set winrm/config/service @{AllowUnencrypted="true"} & winrm set winrm/config/service/auth @{Basic="true"}
+</script>
+<powershell>
+  netsh advfirewall firewall add rule name="WinRM in" protocol=TCP dir=in profile=any localport=5985 remoteip=any localip=any action=allow
+  $admin = [adsi]("WinNT://./administrator, user")
+  $admin.psbase.invoke("SetPassword", "${var.admin_password}")
+  Rename-Computer -NewName "${var.instance_name}-${count.index}" -Restart -Confirm:$False
+</powershell>
+EOF
 
   tags {
     Name = "${var.instance_name}-${count.index}"
