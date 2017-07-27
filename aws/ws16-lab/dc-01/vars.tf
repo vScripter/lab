@@ -1,30 +1,26 @@
+ /*terragrunt {
 
+  include {
+    path = "${find_in_parent_folders()}"
+  }
 
-variable "instance_name" {
-    description = "Instance hostname"
-    default = "dc-01"
+  dependencies {
+    paths = ["../vpc", "../mysql", "../redis"]
+  }
+
+}*/
+
+variable "dc_config" {
+    type    = "map"
+    default = {
+        instance_name   = "dc-01"
+        instance_count  = 1
+        instance_region = "us-east-1"
+        instance_type   = "t2.micro"
+        aws_key_pair    = "kevin-general"
+    }
 }
 
 variable "admin_password" {
     description = "Windows Admin password"
-    default = "VMware1!"
-}
-
-variable "instance_count" {
-    description = "number of instances to deploy"
-    default = 1
-}
-
-variable "instance_region" {
-    description = "Region you wish to deploy resources in"
-    default = "us-east-1"
-}
-
-variable "instance_type" {
-    description = "Instance type/size"
-    default = "t2.micro"
-}
-
-variable "aws_key_pair" {
-    default = "kevin-general"
 }

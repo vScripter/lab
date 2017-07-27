@@ -16,16 +16,8 @@ data "terraform_remote_state" "vpc" {
   }
 }
 
-/*
-module "ws16b" {
-    instance_count = "${var.instance_count}"
-    source         = "../modules/ws16-base"
-    admin_password = "${var.admin_password}"
-}*/
-
-
 provider "aws" {
-    region = "${var.instance_region}"
+    region = "${var.dc_config.["instance_region"]}"
 }
 
 data "aws_ami" "ws16b" {
@@ -54,10 +46,10 @@ data "aws_ami" "ws16b" {
 
 # Primary Domain Controller
 resource "aws_instance" "ws16b" {
-  count                  = "${var.instance_count}"
+  count                  = "${var.dc_config.["instance_count"]}"
   ami                    = "${data.aws_ami.ws16b.id}"
-  instance_type          = "${var.instance_type}"
-  key_name               = "${var.aws_key_pair}"
+  instance_type          = "${var.dc_config.["instance_type"]}"
+  key_name               = "${var.dc_config.["aws_key_pair"]}"
   #subnet_id              = "${data.terraform_remote_state.vpc.subnet_id}"
   #vpc_security_group_ids = ["${data.terraform_remote_state.vpc.instance_sg}"]
   #user_data              = "${data.template_file.user_data.rendered}"
@@ -72,7 +64,7 @@ resource "aws_instance" "ws16b" {
   Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
   Install-Module xActiveDirectory -Force
   Install-Module xComputerManagement -Force
-  Rename-Computer -NewName "${var.instance_name}" -Restart -Confirm:$False
+  Rename-Computer -NewName "${var.dc_config.["instance_name"]}" -Restart -Confirm:$False
 </powershell>
 EOF
 
@@ -83,7 +75,7 @@ EOF
   }
 
   tags {
-    Name = "${var.instance_name}"
+    Name = "${var.dc_config.["instance_name"]}"
   }
 }
 
