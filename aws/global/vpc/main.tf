@@ -45,15 +45,35 @@ resource "aws_subnet" "10-10-1-0_24" {
     vpc_id                  = "${aws_vpc.cloud-lab.id}"
     cidr_block              = "10.10.1.0/24"
     map_public_ip_on_launch = true
+    availability_zone       = "us-east-1c"
 
     tags {
         Name = "10.10.1.0/24"
     }
 }
 
+resource "aws_subnet" "10-10-2-0_24" {
+    vpc_id                  = "${aws_vpc.cloud-lab.id}"
+    cidr_block              = "10.10.2.0/24"
+    map_public_ip_on_launch = true
+    availability_zone       = "us-east-1a"
+
+    tags {
+        Name = "10.10.2.0/24"
+    }
+}
+
 resource "aws_security_group" "instance" {
   name   = "cloud-lab"
   vpc_id = "${aws_vpc.cloud-lab.id}"
+
+    # allow all, internal
+    ingress {
+        from_port   = 0
+        to_port     = 0
+        protocol    = "-1"
+        cidr_blocks = ["${aws_subnet.10-10-1-0_24.cidr_block}","${aws_subnet.10-10-2-0_24.cidr_block}"]
+    }
 
     # ssh
     ingress {
