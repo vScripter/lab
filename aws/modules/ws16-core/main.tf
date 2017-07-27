@@ -45,26 +45,24 @@ data "aws_ami" "ws16_core" {
   }
 }
 
-/*
 data "template_file" "user_data" {
   template = "${file("${path.module}/user-data.txt")}"
 
   vars {
     password       = "${var.admin_password}"
-    hostname       = "${var.instance_name}"
+    hostname       = "${var.instance_name}-${count.index}"
   }
 }
-*/
 
 resource "aws_instance" "ws16_core" {
   count                  = "${var.instance_count}"
   ami                    = "${data.aws_ami.ws16_core.id}"
   instance_type          = "${var.instance_type}"
   key_name               = "${var.aws_key_pair}"
-  subnet_id              = "${data.terraform_remote_state.vpc.subnet_id}"
+  subnet_id              = "${data.terraform_remote_state.vpc.subnet_10-10-1-0_24_id}"
   vpc_security_group_ids = ["${data.terraform_remote_state.vpc.instance_sg}"]
-  #user_data              = "${data.template_file.user_data.rendered}"
-  user_data              = <<EOF
+  user_data              = "${data.template_file.user_data.rendered}"
+  /*user_data              = <<EOF
 <script>
   winrm quickconfig -q & winrm set winrm/config/winrs @{MaxMemoryPerShellMB="300"} & winrm set winrm/config @{MaxTimeoutms="1800000"} & winrm set winrm/config/service @{AllowUnencrypted="true"} & winrm set winrm/config/service/auth @{Basic="true"}
 </script>
@@ -75,7 +73,7 @@ resource "aws_instance" "ws16_core" {
   Rename-Computer -NewName "${var.instance_name}-${count.index}" -Restart -Confirm:$False
 </powershell>
 EOF
-
+*/
   tags {
     Name = "${var.instance_name}-${count.index}"
   }
