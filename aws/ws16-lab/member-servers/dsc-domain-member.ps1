@@ -1,5 +1,7 @@
 #Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force; Install-Module xComputerManagement -Force
 
+Get-DnsClientServerAddress -InterfaceAlias 'Ethernet 2' -AddressFamily IPv4 | Set-DnsClientServerAddress -ServerAddresses @('10.10.1.100')
+
 Set-Location C:\
 
 configuration DomainMember {
