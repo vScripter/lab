@@ -8,7 +8,6 @@
   Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
   Install-Module xActiveDirectory -Force
   Install-Module xComputerManagement -Force
-  #Rename-Computer -NewName "${hostname}" -Restart -Confirm:$False
   $instanceId = (Invoke-RestMethod 'http://169.254.169.254/latest/meta-data/instance-id').ToString()
   $tagName    = (Get-EC2Instance -InstanceId $instanceId).RunningInstance.Tags |  where-object {$_.key -eq "Name"} | select -expand $_.value
   Rename-Computer -NewName $tagName -Force -Restart
