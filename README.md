@@ -1,2 +1,2 @@
 # lab
-All files related to personal lab environments
+All files related to personal lab environments.
