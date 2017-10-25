@@ -2,6 +2,8 @@
 
 Get-DnsClientServerAddress -InterfaceAlias 'Ethernet 2' -AddressFamily IPv4 | Set-DnsClientServerAddress -ServerAddresses @('10.10.1.100')
 
+Clear-DNSClientCache
+
 Set-Location C:\
 
 configuration DomainMember {
@@ -46,7 +48,7 @@ $ConfigData = @{
 }
 
 
-DomainMember -ConfigurationData $ConfigData -DomainCredential (Get-Credential)
+DomainMember -ConfigurationData $ConfigData -DomainCredential (Get-Credential -Message 'Enter Cloud Admin Domain Credential' -Username 'cloud\administrator')
 
 # Make sure that LCM is set to continue configuration after reboot
 Set-DSCLocalConfigurationManager -Path .\DomainMember –Verbose
