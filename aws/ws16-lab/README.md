@@ -26,4 +26,4 @@ You should be able to SSH and RDP directly to anything deployed and those addres
 
 There are preconfigured `.sh` scripts that will execute the desired terraform action on the entire stack (apply/plan/destroy/output/show). I'm working on getting `terragrunt` working, but these scripts are what I'm using, for now.
 
-If you are in a Windows environment, assuming that the `terraform.exe` binary path is in your environmental PATH (`$ENV:Path` in PowerShell), you can rename all of the files with a `.ps1` file extension and they should work just the same.
+If you are in a Windows environment, assuming that the `terraform.exe` binary path is in your environmental PATH (`$ENV:Path` in PowerShell), you can rename all of the `.sh` stack script files with a `.ps1` file extension and they should work just the same.
