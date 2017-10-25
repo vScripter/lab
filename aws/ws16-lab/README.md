@@ -7,9 +7,9 @@
 ## Deployment
 
 By default, this lab will deploy the following:
-* 1 x Server 2016 Server (Full), which will be a domain controller
-* 1 x Server 2016 Server (Full)
-* 1 x Server 2016 Core Server
+* 1 x Server 2016 Server (Full), deployed with the name `dc-01` (meant to be converted to a Domain Controller)
+* 1 x Server 2016 Server (Full), deployed with the name `ws16b-[0..x]` (the number will auto-increment if you choose to deploy more than one )
+* 1 x Server 2016 Core Server, deployed with the name `ws16c-[0..x]` (the number will auto-increment if you choose to deploy more than one )
 
 If desired, you can use the `.ps1` scripts in each of the designated folders to convert the Domain Controller into a PDC, and the member server(s) to domain members. The scripts leverage PowerShell DSC (Desired State Configuration) and will fully configure the PDC and join any Member Server(s) to the domain, if executed.
 
