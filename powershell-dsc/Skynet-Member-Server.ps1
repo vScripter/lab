@@ -19,6 +19,7 @@
     HostName       = WS16-01
     Domain Name    = skynet.lab
     NTDS File Path = C:\NTDS
+    Remote Desktop = Enabled, Nonsecure Allowed
 .NOTES
 
     --------------------------------

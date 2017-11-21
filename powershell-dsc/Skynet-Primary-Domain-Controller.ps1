@@ -20,6 +20,7 @@
     Domain Name        = skynet.lab
     NTDS File Path     = C:\NTDS
     DNS Server Fwd. IP = 208.67.222.222
+    Remote Desktop     = Enabled, Nonsecure Allowed
 .NOTES
 
     --------------------------------
