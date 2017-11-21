@@ -10,12 +10,16 @@
 
     Standard Config
     ---------------------------
-    IPv6           = Disabled
-    ICMP FW Rules  = Allow
-    SMB FW Rules   = Allow
-    HostName       = PDC
-    Domain Name    = skynet.lab
-    NTDS File Path = C:\NTDS
+    IPv6               = Disabled
+    IPv4               = 192.168.100.200/24
+    Gateway            = 192.168.100.2
+    DNS                = 127.0.0.1,208.67.222.22
+    ICMP FW Rules      = Allow
+    SMB FW Rules       = Allow
+    HostName           = PDC
+    Domain Name        = skynet.lab
+    NTDS File Path     = C:\NTDS
+    DNS Server Fwd. IP = 208.67.222.222
 .NOTES
 
     --------------------------------
@@ -38,6 +42,8 @@ Get-NetAdapter -Name Ethernet0 | Set-NetAdapterBinding -ComponentID ms_tcpip6 -E
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module xActiveDirectory -Force
 Install-Module xComputerManagement -Force
+Install-Module xNetworking -Force
+Install-Module xDnsServer -Force
 
 # Setup FW rules to allow ICMP and SMB
 Get-NetFirewallRule -Name *icmp4-erq*|Enable-NetFirewallRule
@@ -58,6 +64,8 @@ configuration LabDomain {
 
     Import-DscResource -ModuleName xActiveDirectory
     Import-DscResource -ModuleName xComputerManagement
+    Import-DscResource -ModuleName xNetworking
+    Import-DscResource -ModuleName xDnsServer
 
     Node $AllNodes.Where{$_.Role -eq 'PrimaryDC'}.Nodename
     {
@@ -68,12 +76,6 @@ configuration LabDomain {
             ActionAfterReboot  = 'ContinueConfiguration'
             ConfigurationMode  = 'ApplyAndAutoCorrect'
             RebootNodeIfNeeded = $true
-        }
-
-        # Setup PDC Computer Name
-        xComputer ComputerName
-        {
-            Name = 'pdc'
         }
 
         # Setup ADDS folders
@@ -89,6 +91,37 @@ configuration LabDomain {
         {
             Ensure = 'Present'
             Name   = 'RSAT-ADDS'
+        }
+
+        # IP Address
+        xIPAddress Eth0IP
+        {
+            AddressFamily  = 'IPv4'
+            InterfaceAlias = 'Ethernet0'
+            IPAddress      = '192.168.100.200/24'
+        }
+
+        # DNS Settings
+        xDNSServerAddress Eth0DNS
+        {
+            AddressFamily  = 'IPv4'
+            InterfaceAlias = 'Ethernet0'
+            Address        = '127.0.0.1', '208.67.222.222'
+        }
+
+        # Default Gateway
+        xDefaultGatewayAddress Eth0Gateway
+        {
+            AddressFamily  = 'IPv4'
+            InterfaceAlias = 'Ethernet0'
+            Address        = '192.168.100.2'
+        }
+
+        # Setup PDC Computer Name
+        xComputer ComputerName
+        {
+            Name      = 'pdc'
+            DependsOn = '[xIPAddress]Eth0IP', '[xDNSServerAddress]Eth0DNS', '[xDefaultGatewayAddress]Eth0Gateway'
         }
 
         # Install ADDS
@@ -108,6 +141,14 @@ configuration LabDomain {
             DatabasePath                  = 'C:\NTDS'
             LogPath                       = 'C:\NTDS'
             DependsOn                     = '[WindowsFeature]ADDSInstall', '[File]ADFiles', '[xComputer]ComputerName'
+        }
+
+        # DNS Server Forwarding Address
+        xDnsServerForwarder DnsFwdAddress
+        {
+            IsSingleInstance = 'Yes'
+            IPAddresses      = '208.67.222.222'
+            DependsOn        = '[xADDomain]FirstDS'
         }
 
     } # node

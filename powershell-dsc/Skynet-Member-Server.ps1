@@ -11,6 +11,9 @@
     Standard Config
     ---------------------------
     IPv6           = Disabled
+    IPv4           = 192.168.100.201/24
+    Gateway        = 192.168.100.2
+    DNS            = 192.168.100.200, 208.67.222.22
     ICMP FW Rules  = Allow
     SMB FW Rules   = Allow
     HostName       = WS16-01
@@ -44,6 +47,7 @@ Get-NetAdapter -Name Ethernet0 | Set-NetAdapterBinding -ComponentID ms_tcpip6 -E
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module xActiveDirectory -Force
 Install-Module xComputerManagement -Force
+Install-Module xNetworking -Force
 
 # Setup FW rules to allow ICMP and SMB
 Get-NetFirewallRule -Name *icmp4-erq*|Enable-NetFirewallRule
@@ -65,6 +69,7 @@ configuration DomainMember {
     Import-DscResource –ModuleName PSDesiredStateConfiguration
     Import-DSCResource -ModuleName xComputerManagement
     Import-DSCResource -ModuleName xActiveDirectory
+    Import-DSCResource -ModuleName xNetworking
 
     Node $AllNodes.Where{$_.Role -eq "MemberServer"}.Nodename {
 
@@ -76,18 +81,35 @@ configuration DomainMember {
             RebootNodeIfNeeded = $true
         }
 
+        # IP Address
+        xIPAddress Eth0IP
+        {
+            AddressFamily  = 'IPv4'
+            InterfaceAlias = 'Ethernet0'
+            IPAddress      = '192.168.100.201/24'
+        }
+
+        # DNS Settings
+        xDNSServerAddress Eth0DNS
+        {
+            AddressFamily  = 'IPv4'
+            InterfaceAlias = 'Ethernet0'
+            Address        = '192.168.100.200', '208.67.222.222'
+        }
+
+        # Default Gateway
+        xDefaultGatewayAddress Eth0Gateway
+        {
+            AddressFamily  = 'IPv4'
+            InterfaceAlias = 'Ethernet0'
+            Address        = '192.168.100.2'
+        }
+
         # Setup Computer Name
         xComputer ComputerName
         {
-            Name = $HostName
-        }
-
-        # Domain member config
-        xComputer DomainMember {
-            Name       = $node.NodeName
-            DomainName = $node.DomainName
-            Credential = $DomainCredential
-            DependsOn  = '[xComputer]ComputerName'
+            Name      = $HostName
+            DependsOn = '[xIPAddress]Eth0IP', '[xDNSServerAddress]Eth0DNS', '[xDefaultGatewayAddress]Eth0Gateway'
         }
 
         # Wait for the domain to be available, if necessary
@@ -97,7 +119,15 @@ configuration DomainMember {
             RetryIntervalSec = 120
             RetryCount       = 5
             RebootRetryCount = 3
-            DependsOn        = '[xComputer]ComputerName', '[xComputer]DomainMember'
+            DependsOn        = '[xComputer]ComputerName'
+        }
+
+        # Domain member config
+        xComputer DomainMember {
+            Name       = $node.NodeName
+            DomainName = $node.DomainName
+            Credential = $DomainCredential
+            DependsOn  = '[xWaitForADDomain]WaitForDomain'
         }
 
     } # Node
