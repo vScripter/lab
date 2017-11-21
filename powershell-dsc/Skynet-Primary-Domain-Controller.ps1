@@ -4,6 +4,10 @@
 .DESCRIPTION
     Sample DSC Configuration for standing up a Domain controller.
 
+    This is written to run on a brand new installation of WS 2016.
+
+    Internet Access is REQUIRED.
+
     Standard Config
     ---------------------------
     IPv6           = Disabled
