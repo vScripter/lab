@@ -31,12 +31,6 @@
     - Created
 #>
 
-# Set a custom DNS Server
-#Get-DnsClientServerAddress -InterfaceAlias 'Ethernet0' ` -AddressFamily IPv4 | Set-DnsClientServerAddress -ServerAddresses @('172.16.225.234')
-
-# Clear the DNS cache
-#Clear-DNSClientCache
-
 # Disable Server Manager (Desktop Experience Only)
 Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\ServerManager -Name DoNotOpenServerManagerAtLogon -Value 1
 
