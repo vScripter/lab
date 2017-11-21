@@ -29,8 +29,7 @@
 #>
 
 # Set a custom DNS Server
-#Get-DnsClientServerAddress -InterfaceAlias 'Ethernet 2' ` -AddressFamily IPv4 |
-#Set-DnsClientServerAddress -ServerAddresses @('10.10.1.100')
+#Get-DnsClientServerAddress -InterfaceAlias 'Ethernet0' ` -AddressFamily IPv4 | Set-DnsClientServerAddress -ServerAddresses @('172.16.225.234')
 
 # Clear the DNS cache
 #Clear-DNSClientCache
