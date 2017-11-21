@@ -172,7 +172,7 @@ $ConfigData = @{
 $splat = @{
     ConfigurationData         = $ConfigData
     SafemodeAdministratorCred = (Get-Credential -UserName '(Password Only)' -Message 'New Domain Safe Mode Administrator Password')
-    DomainCred                = (Get-Credential -UserName lab\administrator -Message 'New Domain Admin Credential')
+    DomainCred                = (Get-Credential -UserName 'skynet\administrator' -Message 'New Domain Admin Credential')
 } # splat
 
 LabDomain @splat
