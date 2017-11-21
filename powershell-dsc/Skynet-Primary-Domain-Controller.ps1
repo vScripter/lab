@@ -59,7 +59,25 @@ configuration LabDomain {
         [pscredential]$safemodeAdministratorCred,
 
         [Parameter(Mandatory)]
-        [pscredential]$domainCred
+        [pscredential]$domainCred,
+
+        [parameter(Mandatory = $true)]
+        [System.String]$HostName,
+
+        [parameter(Mandatory = $true)]
+        [System.String]$InterfaceAlias,
+
+        [parameter(Mandatory = $true)]
+        [System.String]$IPv4Address,
+
+        [parameter(Mandatory = $true)]
+        [System.String]$Eth0Gateway,
+
+        [parameter(Mandatory = $true)]
+        [System.String[]]$Eth0DnsAddress,
+
+        [parameter(Mandatory = $true)]
+        [System.String]$DnsServerForwardingAddress
     )
 
     Import-DscResource -ModuleName xActiveDirectory
@@ -97,24 +115,24 @@ configuration LabDomain {
         xIPAddress Eth0IP
         {
             AddressFamily  = 'IPv4'
-            InterfaceAlias = 'Ethernet0'
-            IPAddress      = '192.168.100.200/24'
+            InterfaceAlias = $InterfaceAlias
+            IPAddress      = $IPv4Address
         }
 
         # DNS Settings
         xDNSServerAddress Eth0DNS
         {
             AddressFamily  = 'IPv4'
-            InterfaceAlias = 'Ethernet0'
-            Address        = '127.0.0.1', '208.67.222.222'
+            InterfaceAlias = $InterfaceAlias
+            Address        = $Eth0DnsAddress
         }
 
         # Default Gateway
         xDefaultGatewayAddress Eth0Gateway
         {
             AddressFamily  = 'IPv4'
-            InterfaceAlias = 'Ethernet0'
-            Address        = '192.168.100.2'
+            InterfaceAlias = $InterfaceAlias
+            Address        = $Eth0Gateway
         }
 
         # Setup PDC Computer Name
@@ -147,7 +165,7 @@ configuration LabDomain {
         xDnsServerForwarder DnsFwdAddress
         {
             IsSingleInstance = 'Yes'
-            IPAddresses      = '208.67.222.222'
+            IPAddresses      = $DnsServerForwardingAddress
             DependsOn        = '[xADDomain]FirstDS'
         }
 
@@ -169,13 +187,19 @@ $ConfigData = @{
     )
 } # ConfigData
 
-$splat = @{
-    ConfigurationData         = $ConfigData
-    SafemodeAdministratorCred = (Get-Credential -UserName '(Password Only)' -Message 'New Domain Safe Mode Administrator Password')
-    DomainCred                = (Get-Credential -UserName 'skynet\administrator' -Message 'New Domain Admin Credential')
-} # splat
+$configurationParams = @{
+    HostName                   = 'PDC'
+    InterfaceAlias             = 'Ethernet0'
+    IPv4Address                = '192.168.100.200/24'
+    Eth0DnsAddress             = '127.0.0.1', '208.67.222.222'
+    Eth0Gateway                = '192.168.100.2'
+    DnsServerForwardingAddress = '208.67.222.222'
+    ConfigurationData          = $ConfigData
+    SafemodeAdministratorCred  = (Get-Credential -UserName '(Password Only)' -Message 'New Domain Safe Mode Administrator Password')
+    DomainCred                 = (Get-Credential -UserName 'skynet\administrator' -Message 'New Domain Admin Credential')
+} # configurationParams
 
-LabDomain @splat
+LabDomain @configurationParams
 
 # Make sure that LCM is set to continue configuration after reboot
 Set-DSCLocalConfigurationManager -Path .\LabDomain -Verbose

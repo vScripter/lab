@@ -63,7 +63,21 @@ configuration DomainMember {
         [PSCredential]$DomainCredential,
 
         [parameter(Mandatory = $true)]
-        [System.String]$HostName
+        [System.String]$HostName,
+
+        [parameter(Mandatory = $true)]
+        [System.String]$InterfaceAlias,
+
+        [parameter(Mandatory = $true)]
+        [System.String]$IPv4Address,
+
+        [parameter(Mandatory = $true)]
+        [System.String]$Eth0Gateway,
+
+        [parameter(Mandatory = $true)]
+        [System.String[]]$Eth0DnsAddress
+
+
     )
 
     Import-DscResource –ModuleName PSDesiredStateConfiguration
@@ -85,24 +99,24 @@ configuration DomainMember {
         xIPAddress Eth0IP
         {
             AddressFamily  = 'IPv4'
-            InterfaceAlias = 'Ethernet0'
-            IPAddress      = '192.168.100.201/24'
+            InterfaceAlias = $InterfaceAlias
+            IPAddress      = $IPv4Address
         }
 
         # DNS Settings
         xDNSServerAddress Eth0DNS
         {
             AddressFamily  = 'IPv4'
-            InterfaceAlias = 'Ethernet0'
-            Address        = '192.168.100.200', '208.67.222.222'
+            InterfaceAlias = $InterfaceAlias
+            Address        = $Eth0DnsAddress
         }
 
         # Default Gateway
         xDefaultGatewayAddress Eth0Gateway
         {
             AddressFamily  = 'IPv4'
-            InterfaceAlias = 'Ethernet0'
-            Address        = '192.168.100.2'
+            InterfaceAlias = $InterfaceAlias
+            Address        = $Eth0Gateway
         }
 
         # Setup Computer Name
@@ -116,7 +130,7 @@ configuration DomainMember {
         xWaitForADDomain WaitForDomain
         {
             DomainName       = 'skynet.lab'
-            RetryIntervalSec = 120
+            RetryIntervalSec = 15
             RetryCount       = 5
             RebootRetryCount = 3
             DependsOn        = '[xComputer]ComputerName'
@@ -145,13 +159,18 @@ $ConfigData = @{
     )
 } # ConfigData
 
-$splat = @{
+$configurationParams = @{
     HostName                  = 'WS16-01'
+    InterfaceAlias            = 'Ethernet0'
+    IPv4Address               = '192.168.100.201/24'
+    Eth0DnsAddress            = '192.168.100.200', '208.67.222.222'
+    Eth0Gateway               = '192.168.100.2'
     ConfigurationData         = $ConfigData
     DomainCredential          = (Get-Credential -UserName 'skynet\administrator' -Message 'Domain Admin Credential')
-} # splat
+} # configurationParams
 
-DomainMember @splat
+# Invoke the configruation
+DomainMember @configurationParams
 
 # Make sure that LCM is set to continue configuration after reboot
 Set-DSCLocalConfigurationManager -Path .\DomainMember –Verbose
