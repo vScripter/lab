@@ -10,8 +10,8 @@
     ICMP FW Rules  = Allow
     SMB FW Rules   = Allow
     HostName       = PDC
-    Domain Name    = lab.local
-    NTDS File Path = C: \NTDS
+    Domain Name    = skynet.lab
+    NTDS File Path = C:\NTDS
 .NOTES
 
     --------------------------------
@@ -23,6 +23,9 @@
     Last Update Notes:
     - Created
 #>
+
+# Disable Server Manager (Desktop Experience Only)
+Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\ServerManager -Name DoNotOpenServerManagerAtLogon -Value 1
 
 # Disable IPv6
 Get-NetAdapter -Name Ethernet0 | Set-NetAdapterBinding -ComponentID ms_tcpip6 -Enabled:$false
@@ -113,7 +116,7 @@ $ConfigData = @{
         @{
             Nodename                    = 'localhost'
             Role                        = 'PrimaryDC'
-            DomainName                  = 'lab.local'
+            DomainName                  = 'skynet.lab'
             RetryCount                  = 20
             RetryIntervalSec            = 30
             PsDscAllowPlainTextPassword = $true
