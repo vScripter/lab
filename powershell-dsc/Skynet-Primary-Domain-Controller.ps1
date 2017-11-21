@@ -32,6 +32,9 @@
     - Created
 #>
 
+# Set local admin password to never export
+Get-LocalUser -Name Administrator | Set-LocalUser -PasswordNeverExpires:$True
+
 # Disable Server Manager (Desktop Experience Only)
 Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\ServerManager -Name DoNotOpenServerManagerAtLogon -Value 1
 
