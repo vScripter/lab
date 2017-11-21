@@ -8,15 +8,16 @@ Set-Location C:\
 
 configuration DomainMember {
 
-param(
-    [parameter(Mandatory = $true)]
-    [PSCredential]$DomainCredential
-)
+    param(
+        [parameter(Mandatory = $true)]
+        [PSCredential]$DomainCredential
+    )
 
-Import-DscResource –ModuleName 'PSDesiredStateConfiguration'
-Import-DSCResource -ModuleName xComputerManagement
+    Import-DscResource –ModuleName PSDesiredStateConfiguration
+    Import-DSCResource -ModuleName xComputerManagement
+    Import-DSCResource -ModuleName xActiveDirectory
 
-Node $AllNodes.Where{$_.Role -eq "Member-Server"}.Nodename {
+    Node $AllNodes.Where{$_.Role -eq "Member-Server"}.Nodename {
 
         LocalConfigurationManager
         {
@@ -31,8 +32,16 @@ Node $AllNodes.Where{$_.Role -eq "Member-Server"}.Nodename {
             Credential = $DomainCredential
         }
 
-}
+        xWaitForADDomain WaitForCloudDomain
+        {
+            DomainName = 'cloud.lab'
+            RetryIntervalSev = 120
+            RetryCount = 5
+            RebootRetryCount = 3
+            DependsOn = '[xComputer]DomainMember'
+        }
 
+    } # Node
 
 } # configuration
 
@@ -56,4 +65,4 @@ Set-DSCLocalConfigurationManager -Path .\DomainMember –Verbose
 # Build the domain
 Start-DscConfiguration -Wait -Force -Path .\DomainMember -Verbose
 
-Write-Output 'Config Applied'
+# Complete
