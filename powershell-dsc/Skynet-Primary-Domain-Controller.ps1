@@ -47,6 +47,7 @@ Install-Module xActiveDirectory -Force
 Install-Module xComputerManagement -Force
 Install-Module xNetworking -Force
 Install-Module xDnsServer -Force
+Install-Module xRemoteDesktopAdmin -Force
 
 # Setup FW rules to allow ICMP and SMB
 Get-NetFirewallRule -Name *icmp4-erq*|Enable-NetFirewallRule
@@ -87,6 +88,7 @@ configuration LabDomain {
     Import-DscResource -ModuleName xComputerManagement
     Import-DscResource -ModuleName xNetworking
     Import-DscResource -ModuleName xDnsServer
+    Import-DSCResource -ModuleName xRemoteDesktopAdmin
 
     Node $AllNodes.Where{$_.Role -eq 'PrimaryDC'}.Nodename
     {
@@ -97,6 +99,13 @@ configuration LabDomain {
             ActionAfterReboot  = 'ContinueConfiguration'
             ConfigurationMode  = 'ApplyAndAutoCorrect'
             RebootNodeIfNeeded = $true
+        }
+
+        # Enable Remote Desktop
+        xRemoteDesktopAdmin EnableRDP
+        {
+            Ensure             = 'True'
+            UserAuthentication = 'NonSecure'
         }
 
         # Setup ADDS folders

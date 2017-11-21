@@ -45,6 +45,7 @@ Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module xActiveDirectory -Force
 Install-Module xComputerManagement -Force
 Install-Module xNetworking -Force
+Install-Module xRemoteDesktopAdmin -Force
 
 # Setup FW rules to allow ICMP and SMB
 Get-NetFirewallRule -Name *icmp4-erq*|Enable-NetFirewallRule
@@ -81,6 +82,7 @@ configuration DomainMember {
     Import-DSCResource -ModuleName xComputerManagement
     Import-DSCResource -ModuleName xActiveDirectory
     Import-DSCResource -ModuleName xNetworking
+    Import-DSCResource -ModuleName xRemoteDesktopAdmin
 
     Node $AllNodes.Where{$_.Role -eq "MemberServer"}.Nodename {
 
@@ -90,6 +92,13 @@ configuration DomainMember {
             ActionAfterReboot  = 'ContinueConfiguration'
             ConfigurationMode  = 'ApplyAndAutoCorrect'
             RebootNodeIfNeeded = $true
+        }
+
+        # Enable Remote Desktop
+        xRemoteDesktopAdmin EnableRDP
+        {
+            Ensure             = 'Present'
+            UserAuthentication = 'NonSecure'
         }
 
         # IP Address
