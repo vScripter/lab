@@ -51,6 +51,7 @@ Install-Module xRemoteDesktopAdmin -Force
 # Setup FW rules to allow ICMP and SMB
 Get-NetFirewallRule -Name *icmp4-erq*|Enable-NetFirewallRule
 Get-NetFirewallRule -Name *fps-smb*|Enable-NetFirewallRule
+Get-NetFirewallRule -Name *remotedesktop*|Enable-NetFirewallRule
 
 # Start init
 Set-Location C:\
