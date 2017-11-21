@@ -73,6 +73,8 @@ resource "aws_instance" "ws16_core" {
   Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
   Install-Module xActiveDirectory -Force
   Install-Module xComputerManagement -Force
+  Install-Module xSmbShare -Force
+  Install-Module cNtfsAccessControl -Force
   Get-NetFirewallRule -Name *icmp4-erq*|Enable-NetFirewallRule
   Get-NetFirewallRule -Name *fps-smb*|Enable-NetFirewallRule
   Rename-Computer -NewName "${var.instance_name}-${count.index}" -Force -Restart
