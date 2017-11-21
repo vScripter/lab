@@ -4,6 +4,10 @@ These scripts contain a DSC configuration that is purpose-built to be run on ind
 
 They were written with a use-case of being able to quickly change the personality of a newly deployed Windows Server.
 
+## Prerequisites
+- Windows Server .ISO/Image
+- Internet Access _(Guests need access to pull DSC Resource Modules from the PowerShell Gallery)_
+
 ## Execution
 - Copy/Paste the contents of the script into the PowerShell Console on the designated server
 - The DSC config is written to wait for Domain availability for Member Servers, which supports deploying all servers at the same time (no need to wait for the DC to be available before processing with deployment of the Member Servers)
