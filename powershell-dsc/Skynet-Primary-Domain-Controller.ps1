@@ -39,6 +39,9 @@ Get-LocalUser -Name Administrator | Set-LocalUser -PasswordNeverExpires:$True
 # Disable Server Manager (Desktop Experience Only)
 Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\ServerManager -Name DoNotOpenServerManagerAtLogon -Value 1
 
+# Set PowerShell as the default shell in Server Core
+#Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon' -Name Shell -Value 'PowerShell.exe -noExit'
+
 # Disable IPv6
 Get-NetAdapter -Name Ethernet0 | Set-NetAdapterBinding -ComponentID ms_tcpip6 -Enabled:$false
 
@@ -106,7 +109,7 @@ configuration LabDomain {
         # Enable Remote Desktop
         xRemoteDesktopAdmin EnableRDP
         {
-            Ensure             = 'True'
+            Ensure             = 'Present'
             UserAuthentication = 'NonSecure'
         }
 
