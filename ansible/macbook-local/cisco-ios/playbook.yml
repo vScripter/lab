@@ -1,0 +1,21 @@
+---
+
+- name: iOS-XE Test Playbook
+  connection: network_cli
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: show run
+      ios_command:
+        commands: show running-config
+
+      register: output
+
+    - name: show output
+      debug:
+      var: output.stdout
+
+    - name: copy output to file
+      copy: content="{{ output }}" dest=./output/{{ inventory_hostname }}.txt
+...

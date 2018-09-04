@@ -1,0 +1,19 @@
+---
+
+- name: iOS-XE Test Playbook
+  connection: network_cli
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Configure Hostname
+      ios_system:
+        hostname: csr1kv-01
+
+    - name: Configure L3 Mgmt Interface
+      ios_l3_interface:
+        name: GigabitEthernet1
+        ipv4: 192.168.214.128/24
+        state: present
+
+...

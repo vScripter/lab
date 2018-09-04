@@ -1,0 +1,25 @@
+---
+
+- name: iOS-XE Test Playbook
+  connection: network_cli
+  hosts: all
+  gather_facts: true
+
+  tasks:
+
+    - name: Return facts
+      iosxr_command:
+        commands: show running-config
+
+
+      register: output
+
+    - name: show output
+      debug:
+      var: output.stdout
+
+    - name: show facts
+      debug:
+      msg: output
+
+...
